@@ -1,38 +1,40 @@
 // lib/models/my_transaction.dart
-enum TransactionType { income, expense }
-
-class MyTransaction {
+class  Album {
   final int? id;
   final String title;
-  final double amount;
-  final DateTime date;
-  final TransactionType type;
+  final String artist;
+  final int trackCount;
+  final DateTime releaseDate;
+  final bool isOwned;
 
-  MyTransaction({
+  Album({
     this.id,
     required this.title,
-    required this.amount,
-    required this.date,
-    required this.type,
+    required this.artist,
+    required this.trackCount,
+    required this.releaseDate,
+    required this.isOwned,
   });
 
   Map<String, dynamic> toMap() {
     return {
       if (id != null) 'id': id, // ห้ามส่ง id ที่เป็น null เข้าไปใน UPDATE
       'title': title,
-      'amount': amount,
-      'date': date.toIso8601String(),
-      'type': type.name, // เก็บเป็น 'income' หรือ 'expense'
+      'artist': artist,
+      'trackCount': trackCount,
+      'releaseDate': releaseDate.toIso8601String(),
+      'isOwned': isOwned, // เก็บเป็น true หรือ false
     };
   }
 
-  factory MyTransaction.fromMap(Map<String, dynamic> map) {
-    return MyTransaction(
+  factory Album.fromMap(Map<String, dynamic> map) {
+    return Album(
       id: map['id'] as int,
       title: map['title'] as String,
-      amount: (map['amount'] as num).toDouble(),
-      date: DateTime.parse(map['date'] as String),
-      type: TransactionType.values.byName(map['type'] as String),
+      artist: map['artist'] as String,
+      trackCount: map['trackCount'] as int,
+      releaseDate: DateTime.parse(map['releaseDate'] as String),
+      isOwned: map['isOwned'] as bool,
     );
   }
 }

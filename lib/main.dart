@@ -7,7 +7,7 @@ import 'screens/transaction_list_screen.dart';
 void main() {
   runApp(
     ChangeNotifierProvider(
-      create: (context) => TransactionProvider(),
+      create: (context) => AlbumProvider(),
       child: const MyApp(),
     ),
   );
@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       title: 'Expense Tracker',
-      home: TransactionListScreen(), // เปลี่ยนเป็นหน้าจอหลัก
+      home: AlbumListScreen(), // เปลี่ยนเป็นหน้าจอหลัก
     );
   }
 }

@@ -4,17 +4,17 @@ import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import '../models/my_transaction.dart';
 
-class TransactionProvider with ChangeNotifier {
-  static const String _dbName = 'expenses.db';
-  static const String _tableName = 'transactions';
+class AlbumProvider with ChangeNotifier {
+  static const String _dbName = 'albums.db';
+  static const String _tableName = 'albums';
   Database? _database;
-  List<MyTransaction> _transactions = [];
+  List<Album> _albums = [];
 
-  TransactionProvider() {
-    fetchAndSetTransactions(); // โหลดข้อมูลเมื่อ Provider ถูกสร้าง
+  AlbumProvider() {
+    fetchAndSetAlbums(); // โหลดข้อมูลเมื่อ Provider ถูกสร้าง
   }
 
-  List<MyTransaction> get transactions => [..._transactions];
+  List<Album> get albums => [..._albums];
 
   // กระบวนการที่ 2: การสร้างฐานข้อมูล
   Future<void> _initDatabase() async {
@@ -28,7 +28,7 @@ class TransactionProvider with ChangeNotifier {
         onCreate: (db, version) {
           print('Creating table $_tableName...');
           return db.execute(
-            'CREATE TABLE $_tableName(id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, amount REAL, date TEXT, type TEXT)',
+            'CREATE TABLE $_tableName(id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, artist TEXT, trackCount INTEGER, releaseDate TEXT, isOwned BOOLEAN)',
           );
         },
       );
@@ -39,53 +39,55 @@ class TransactionProvider with ChangeNotifier {
   }
 
   // กระบวนการที่ 3: การ Insert
-  Future<void> addTransaction(
+  Future<void> addAlbum(
     String title,
-    double amount,
-    DateTime date,
-    TransactionType type,
+    String artist,
+    int trackCount,
+    DateTime releaseDate,
+    bool isOwned,
   ) async {
     await _initDatabase(); // ตรวจสอบว่า DB พร้อมใช้งาน
     if (_database == null) return;
 
-    final newTransaction = MyTransaction(
+    final newAlbum = Album(
       title: title,
-      amount: amount,
-      date: date,
-      type: type,
+      artist: artist,
+      trackCount: trackCount,
+      releaseDate: releaseDate,
+      isOwned: isOwned,
     );
 
-    final id = await _database!.insert(_tableName, newTransaction.toMap());
-    print('Inserted transaction with id: $id');
-    await fetchAndSetTransactions();
+    final id = await _database!.insert(_tableName, newAlbum.toMap());
+    print('Inserted album with id: $id');
+    await fetchAndSetAlbums();
   }
 
   // กระบวนการที่ 4: การ Read
-  Future<void> fetchAndSetTransactions() async {
+  Future<void> fetchAndSetAlbums() async {
     await _initDatabase();
     if (_database == null) return;
 
     final dataList = await _database!.query(_tableName, orderBy: 'date DESC');
-    _transactions = dataList.map((item) => MyTransaction.fromMap(item)).toList();
-    print('Fetched ${_transactions.length} transactions.');
+    _albums = dataList.map((item) => Album.fromMap(item)).toList();
+    print('Fetched ${_albums.length} albums.');
     notifyListeners(); // แจ้ง UI ให้วาดใหม่
   }
 
   // กระบวนการที่ 5: การ Update
-  Future<void> updateTransaction(int id, MyTransaction newTransaction) async {
+  Future<void> updateAlbum(int id, Album newAlbum) async {
     await _initDatabase();
     if (_database == null) return;
     await _database!.update(
       _tableName,
-      newTransaction.toMap(), // toMap() ไม่ส่ง id ที่เป็น null จึงไม่ไปเปลี่ยนคีย์หลัก
+      newAlbum.toMap(), // toMap() ไม่ส่ง id ที่เป็น null จึงไม่ไปเปลี่ยนคีย์หลัก
       where: 'id = ?',
       whereArgs: [id],
     );
-    await fetchAndSetTransactions();
+    await fetchAndSetAlbums();
   }
 
   // กระบวนการที่ 6: การ Delete
-  Future<void> deleteTransaction(int id) async {
+  Future<void> deleteAlbum(int id) async {
     await _initDatabase();
     if (_database == null) return;
     await _database!.delete(
@@ -93,6 +95,6 @@ class TransactionProvider with ChangeNotifier {
       where: 'id = ?',
       whereArgs: [id],
     );
-    await fetchAndSetTransactions();
+    await fetchAndSetAlbums();
   }
 }

@@ -5,40 +5,40 @@ import 'package:intl/intl.dart';
 import '../providers/transaction_provider.dart';
 import '../models/my_transaction.dart';
 
-class TransactionListScreen extends StatelessWidget {
-  const TransactionListScreen({super.key});
+class AlbumListScreen extends StatelessWidget {
+  const AlbumListScreen({super.key});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('รายรับ-รายจ่าย')),
-      body: Consumer<TransactionProvider>(
-        builder: (context, txProvider, child) =>
-            txProvider.transactions.isEmpty
+      body: Consumer<AlbumProvider>(
+        builder: (context, albumProvider, child) =>
+            albumProvider.albums.isEmpty
                 ? const Center(child: Text('ไม่มีรายการ'))
                 : ListView.builder(
-                    itemCount: txProvider.transactions.length,
+                    itemCount: albumProvider.albums.length,
                     itemBuilder: (ctx, i) {
-                      final tx = txProvider.transactions[i];
+                      final album = albumProvider.albums[i];
                       return ListTile(
                         leading: CircleAvatar(
-                          child: Text(tx.type == TransactionType.income ? 'รับ' : 'จ่าย'),
+                          child: Text(album.isOwned ? 'มี' : 'ไม่มี'),
                         ),
-                        title: Text(tx.title),
-                        subtitle: Text(DateFormat.yMMMd().format(tx.date)),
+                        title: Text(album.title),
+                        subtitle: Text(DateFormat.yMMMd().format(album.releaseDate)),
                         trailing: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(
-                              '${tx.amount.toStringAsFixed(2)} บาท',
+                              '${album.trackCount.toString()} แทร็ก',
                               style: TextStyle(
-                                color: tx.type == TransactionType.income ? Colors.green : Colors.red,
+                                color: Colors.black,
                               ),
                             ),
                             IconButton(
                               icon: const Icon(Icons.delete, color: Colors.grey),
                               onPressed: () {
                                 // เรียกเมธอด delete
-                                context.read<TransactionProvider>().deleteTransaction(tx.id!);
+                                context.read<AlbumProvider>().deleteAlbum(album.id!);
                               },
                             ),
                           ],
@@ -49,11 +49,12 @@ class TransactionListScreen extends StatelessWidget {
       ),
       // ปุ่มเพิ่มรายการตัวอย่างชั่วคราว จนกว่าจะสร้างหน้าฟอร์มในการบ้าน
       floatingActionButton: FloatingActionButton(
-        onPressed: () => context.read<TransactionProvider>().addTransaction(
-              'ค่าอาหาร',
-              120.0,
+        onPressed: () => context.read<AlbumProvider>().addAlbum(
+              'อัลบั้มใหม่',
+              'ศิลปินใหม่',
+              10,
               DateTime.now(),
-              TransactionType.expense,
+              false,
             ),
         child: const Icon(Icons.add),
       ),
